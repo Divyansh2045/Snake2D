@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Unity.VisualScripting;
@@ -17,30 +18,41 @@ public class PlayerController : MonoBehaviour
     public float speed;
     public float moveDelay = 0.4f;
     private float moveTimer = 0.0f;
-    public List<Vector3> positionHistory = new List<Vector3>();
+    [SerializeField] List<Vector3> positionHistory = new List<Vector3>();
     List<Quaternion> rotationHistory = new List<Quaternion>();
     List<GameObject> snakeParts = new List<GameObject>();
     public GameObject snakeBodyPrefab;
     public int stepsBehind;
+
+    private void Awake()
+    {
+        snakeParts.Add(this.gameObject);
+         for (int i = 0; i < 3; i++)
+     {
+         Vector3 startingPosition = transform.position - new Vector3(0, i + 1, 0);
+         GameObject bodySegment = Instantiate(snakeBodyPrefab, startingPosition, Quaternion.identity);
+         snakeParts.Add(bodySegment);
+     } 
+
+    }
+
+    private void Start()
+    {
+       // positionHistory.Insert(0,transform.position);
+        
+       /* for (int i = 0; i < 3; i++)
+        {
+            Vector3 startingPosition = transform.position - new Vector3(0, i + 1, 0);
+            GameObject bodySegment = Instantiate(snakeBodyPrefab, startingPosition, Quaternion.identity);
+            snakeParts.Add(bodySegment);
+        } */
+    }
 
     private void Update()
     {
         HandleInput();
         MoveCharacter();
     }
-
-    private void Start()
-    {
-        snakeParts.Add(this.gameObject);
-        for (int i = 0; i < 3; i++)
-        {
-            Vector3 startingPosition = transform.position - new Vector3(0, i + 1, 0);
-            GameObject bodySegment = Instantiate(snakeBodyPrefab, startingPosition, Quaternion.identity);
-            snakeParts.Add(bodySegment);
-        }
-       
-    }
-
 
 
 
@@ -53,7 +65,7 @@ public class PlayerController : MonoBehaviour
                 return;
             }
             currentDirection = Direction.Up;
-            transform.rotation = Quaternion.Euler(0,0,0);
+          
         }
         else if (Input.GetKeyDown(KeyCode.DownArrow))
         {
@@ -62,7 +74,7 @@ public class PlayerController : MonoBehaviour
                 return;
             }
             currentDirection = Direction.Down;
-            transform.rotation = Quaternion.Euler(0, 0, -180);
+         
         }
         else if ( Input.GetKeyDown(KeyCode.LeftArrow))
         {
@@ -71,7 +83,7 @@ public class PlayerController : MonoBehaviour
                 return;
             }
             currentDirection = Direction.Left;
-            transform.rotation = Quaternion.Euler(0, 0, 90);
+          
 
         }
         else if (Input.GetKeyDown (KeyCode.RightArrow))
@@ -81,9 +93,34 @@ public class PlayerController : MonoBehaviour
                 return;
             }
             currentDirection = Direction.Right;
-            transform.rotation = Quaternion.Euler(0, 0, -90f);
+           
         }
 
+    }
+
+    public void growSnake()
+    {
+        int index = snakeParts.Count * stepsBehind;
+
+        Vector3 position;
+        Quaternion rotation;
+
+        if (index < positionHistory.Count)
+        {
+            position = positionHistory[index];
+            rotation = rotationHistory[index];
+        }
+        else
+        {
+            // fallback to the last snake part’s current position
+            GameObject lastPart = snakeParts[snakeParts.Count - 1];
+            position = lastPart.transform.position;
+            rotation = lastPart.transform.rotation;
+        }
+
+        GameObject newBodySegment = Instantiate(snakeBodyPrefab, position, rotation);
+        snakeParts.Add(newBodySegment);
+        Debug.Log("New body is being created");
     }
 
     private void MoveCharacter()
@@ -114,16 +151,34 @@ public class PlayerController : MonoBehaviour
             }
 
             transform.position += moveVector * speed;
+
+            switch(currentDirection)
+            {
+                case Direction.Up:
+                    transform.rotation = Quaternion.Euler(0, 0, 0);
+                    break;
+                case Direction.Down:
+                    transform.rotation = Quaternion.Euler(0, 0, -180);
+                    break;
+                case Direction.Left:
+                    transform.rotation = Quaternion.Euler(0, 0, 90);
+                    break;
+                case Direction.Right:
+                    transform.rotation = Quaternion.Euler(0, 0, -90);
+                    break;
+                
+            }
             positionHistory.Insert(0,transform.position);
             rotationHistory.Insert(0,transform.rotation);
 
-            for (int i = 0; i < snakeParts.Count; i++)
+            for (int i = 1; i < snakeParts.Count; i++)
             {
-                int index = (i+1) * stepsBehind;
-                if(index < positionHistory.Count)
+                int index = i * stepsBehind;
+                //index = Mathf.Min(index, positionHistory.Count - 1);
+                if (index < positionHistory.Count)
                 {
-                    snakeParts[i+1].transform.position = positionHistory[index];
-                    snakeParts[i+1].transform.rotation = rotationHistory[index];
+                    snakeParts[i].transform.position = positionHistory[index];
+                    snakeParts[i].transform.rotation = rotationHistory[index];
                 }
             }
 
