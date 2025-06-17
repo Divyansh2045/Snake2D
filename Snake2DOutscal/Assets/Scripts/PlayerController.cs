@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using Unity.VisualScripting;
+using System.Linq;
+using UnityEditor.Timeline;
 using UnityEngine;
 
 public enum Direction
@@ -100,11 +100,10 @@ public class PlayerController : MonoBehaviour
 
     public void growSnake()
     {
-        int index = snakeParts.Count * stepsBehind;
+        int index = (snakeParts.Count) * stepsBehind;
 
         Vector3 position;
         Quaternion rotation;
-
         if (index < positionHistory.Count)
         {
             position = positionHistory[index];
@@ -112,16 +111,15 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            // fallback to the last snake part’s current position
-            GameObject lastPart = snakeParts[snakeParts.Count - 1];
-            position = lastPart.transform.position;
-            rotation = lastPart.transform.rotation;
+            position = snakeParts[snakeParts.Count - 1].transform.position; // fallback
+            rotation = snakeParts[snakeParts.Count - 1].transform.rotation; // fallback rotation
         }
 
         GameObject newBodySegment = Instantiate(snakeBodyPrefab, position, rotation);
         snakeParts.Add(newBodySegment);
-        Debug.Log("New body is being created");
+
     }
+
 
     private void MoveCharacter()
     {
