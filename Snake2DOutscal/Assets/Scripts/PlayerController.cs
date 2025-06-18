@@ -20,9 +20,10 @@ public class PlayerController : MonoBehaviour
     private float moveTimer = 0.0f;
     [SerializeField] List<Vector3> positionHistory = new List<Vector3>();
     List<Quaternion> rotationHistory = new List<Quaternion>();
-    List<GameObject> snakeParts = new List<GameObject>();
+    public List<GameObject> snakeParts = new List<GameObject>();
     public GameObject snakeBodyPrefab;
     public int stepsBehind;
+    bool snakeShield = false;
 
     private void Awake()
     {
@@ -118,6 +119,28 @@ public class PlayerController : MonoBehaviour
         GameObject newBodySegment = Instantiate(snakeBodyPrefab, position, rotation);
         snakeParts.Add(newBodySegment);
 
+    }
+
+    private void PlayerDie()
+    {
+        if(snakeShield == true)
+        {
+            return;
+        }
+
+        if (snakeShield == false) 
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    public void massBurner()
+    {
+        if (snakeParts.Count == 0) return;
+
+        GameObject lastSegment = snakeParts[snakeParts.Count - 1];
+        snakeParts.RemoveAt(snakeParts.Count - 1);
+        Destroy(lastSegment);
     }
 
 
