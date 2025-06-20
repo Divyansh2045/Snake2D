@@ -16,6 +16,7 @@ public class ShieldPowerUpController : MonoBehaviour
         isCollected = true;
         PlayerController playerController = collision.GetComponent<PlayerController>();
         playerController.ShieldPowerUp();
+        powerUpController.powerUpTimer = 0;
         powerUpController.activePowerUps.Remove(gameObject);
         Destroy(gameObject);
     }

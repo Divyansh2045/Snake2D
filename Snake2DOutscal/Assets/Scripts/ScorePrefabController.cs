@@ -19,6 +19,7 @@ public class ScorePrefabController : MonoBehaviour
         isCollected = true;
         //DoubleScore -- Score Controller
         Debug.Log("gameobject destroyed");
+        powerUpController.powerUpTimer = 0;
         powerUpController.activePowerUps.Remove(gameObject);
         Destroy(gameObject);
     }
