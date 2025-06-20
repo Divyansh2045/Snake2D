@@ -11,7 +11,7 @@ public class SnakeBodyController : MonoBehaviour
             playerController = collision.gameObject.GetComponent<PlayerController>();
 
             Debug.Log("Player collided with its own body and Player died");
-              PlayerController.PlayerDie();
+              playerController.PlayerDie();
             //Show game over UI
         }
 

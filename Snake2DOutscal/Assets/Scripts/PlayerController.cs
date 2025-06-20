@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEditor.Timeline;
 using UnityEngine;
 
@@ -23,7 +24,9 @@ public class PlayerController : MonoBehaviour
     public List<GameObject> snakeParts = new List<GameObject>();
     public GameObject snakeBodyPrefab;
     public int stepsBehind;
-    bool snakeShield = false;
+    public bool snakeShield = false;
+    public float shieldDuration;
+    public float shieldPowerUpTimer;
 
     private void Awake()
     {
@@ -53,6 +56,7 @@ public class PlayerController : MonoBehaviour
     {
         HandleInput();
         MoveCharacter();
+        PowerUpTimer();
     }
 
 
@@ -121,17 +125,36 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    private void PlayerDie()
+    public void PowerUpTimer()
     {
-        if(snakeShield == true)
+        if (snakeShield)
+        {
+            shieldPowerUpTimer += Time.deltaTime;
+        }
+
+        if (shieldPowerUpTimer > shieldDuration)
+        {
+            snakeShield = false;
+            shieldPowerUpTimer = 0;
+        }
+
+    }
+
+    public void ShieldPowerUp()
+    {
+        Debug.Log(" shieldpowerup is active");
+
+        snakeShield = true;
+    }
+
+    public void PlayerDie()
+    {
+        if(snakeShield)
         {
             return;
         }
-
-        if (snakeShield == false) 
-        {
             Destroy(gameObject);
-        }
+        
     }
 
     public void massBurner()

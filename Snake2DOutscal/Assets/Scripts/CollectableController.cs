@@ -25,6 +25,7 @@ public class CollectableController : MonoBehaviour
             Debug.Log("First touch");
             gameManagerController.fruits.Remove(gameObject);
             Destroy(gameObject);
+            Debug.Log(" fruit status: " + isCollected);
 
         }
     }

@@ -1,22 +1,22 @@
 using System.Collections.Generic;
-using NUnit.Framework;
 using UnityEngine;
+
 
 public class GameManagerController : MonoBehaviour
 {
     public float spawnTimer;
     public float spawnDelay;
-    //public float massBurnerSpawnTimer;
-  //  public float massBurnerSpawnDelay;
+    public float massBurnerSpawnTimer;
+    public float massBurnerSpawnDelay;
     public GameObject growSnakeCollectible;
     public GameObject massBurnerCollectible;
-    public List<Transform> spawnPositions = new List<Transform>();
+    public List<Vector2Int> spawnPositions;
     public int totalFruit;
     public int totalMassBurner;
     public List<GameObject> fruits = new List<GameObject>();
     public List<GameObject> massBurner = new List<GameObject>();
-
     public PlayerController playerController;
+    public PowerUpController powerUpController;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -28,6 +28,7 @@ public class GameManagerController : MonoBehaviour
     {
         SpawnFood();
         SpawnMassBurner();
+        powerUpController.SpawnPowerUps();
     }
 
     private void SpawnFood()
@@ -43,27 +44,32 @@ public class GameManagerController : MonoBehaviour
         if (spawnTimer > spawnDelay)
         {
             spawnTimer = 0;
-            GameObject newFruit = Instantiate(growSnakeCollectible, spawnPositions[Random.Range(0, spawnPositions.Count)]);
+            Vector2Int position = spawnPositions[Random.Range(0, spawnPositions.Count)];
+            GameObject newFruit = Instantiate(growSnakeCollectible, new Vector3(position.x, position.y, 0), Quaternion.identity);
+
             fruits.Add(newFruit);
         }
     }
 
     private void SpawnMassBurner()
     {
+        
         if (playerController.snakeParts.Count < 5)
         {
             return;
         }
 
-        if (massBurner.Count > 3 )
+        if (massBurner.Count > 2 )
         {
             return;
         }
-
-        if (spawnTimer > spawnDelay)
+        massBurnerSpawnTimer += Time.deltaTime;
+        if (massBurnerSpawnTimer > massBurnerSpawnDelay)
         {
-            spawnTimer = 0;
-            GameObject newMassBurner = Instantiate(massBurnerCollectible, spawnPositions[Random.Range(0,spawnPositions.Count)]);
+            massBurnerSpawnTimer = 0;
+            Vector2Int position = spawnPositions[Random.Range(0, spawnPositions.Count)];
+            GameObject newMassBurner = Instantiate(massBurnerCollectible, new Vector3(position.x, position.y, 0), Quaternion.identity);
+            
             massBurner.Add(newMassBurner);
         }
     }
